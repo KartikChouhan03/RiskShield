@@ -103,17 +103,27 @@ RiskShield/
 └── README.md
 ```
 
-🚀 How to Run
-Install Dependencies
+---
+## 🚀 How to Run
 
-Bash
+### Install Dependencies
+
+```bash
 pip install -r requirements.txt
-Train the Model
+```
 
+### Train the Model
+
+```bash
 python src/train.py
-Launch the UI
+```
 
+### Launch the UI
+
+```bash
 streamlit run app.py
+```
 
-🏁 Conclusion
+---
+## 🏁 Conclusion
 RiskShield demonstrates a production-ready approach to fraud detection by combining statistical learning with risk-aware logic. It moves beyond "Accuracy" to focus on Recall and Precision, ensuring that high-value fraud is captured while legitimate customers remain unaffected.

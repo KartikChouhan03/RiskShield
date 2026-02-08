@@ -1,224 +1,119 @@
-RiskShield – Fraud Risk Scoring System
+# 🛡️ RiskShield – Fraud Risk Scoring System
 
-Overview
+**RiskShield** is a machine learning-powered fraud detection system designed to identify suspicious credit card transactions through risk-aware scoring. Rather than providing a simple binary "yes/no," the system assigns a probability-based score to categorize transactions into **Low**, **Medium**, or **High** risk levels.
 
-RiskShield is a machine learning–based fraud risk scoring system designed to identify suspicious credit card transactions and support informed decision-making.
-Instead of making a binary fraud / not fraud decision, the system assigns a risk score and categorizes transactions into LOW, MEDIUM, or HIGH risk.
+This project addresses core real-world ML challenges: **extreme class imbalance**, **cost-sensitive decision-making**, and **model explainability**.
 
-This project focuses on real-world ML challenges such as extreme class imbalance, cost-sensitive decisions, and deployment consistency.
+---
 
-🎯 Problem Statement
+## 🎯 Problem Statement
+Credit card fraud is a rare but highly costly event. Traditional rule-based systems often struggle with evolving fraud patterns and high false-positive rates, leading to customer dissatisfaction.
 
-Credit card fraud is a rare but highly costly event.
-Traditional rule-based systems often fail to detect evolving fraud patterns or generate excessive false positives.
+* **Early Detection:** Identifying fraud before the transaction is finalized.
+* **User Experience:** Minimizing friction for genuine users.
+* **Explainability:** Providing "Why" a transaction was flagged for manual review.
 
-The challenge is to:
+---
 
-Detect fraudulent transactions early
+## 🧠 Solution Approach
+RiskShield treats fraud detection as a **Risk Assessment** problem rather than a standard classification task.
 
-Minimize inconvenience to genuine users
+1.  **Pattern Learning:** Trains on historical PCA-transformed transaction data.
+2.  **Probability Mapping:** Outputs a raw fraud score between 0.0 and 1.0.
+3.  **Risk Tiering:** Maps scores to actionable risk categories (Low, Medium, High).
+4.  **Decision Logic:** Triggers specific system actions (Allow, Verify, or Flag) based on the tier.
 
-Provide explainable and risk-aware decisions
 
-🧠 Solution Approach
 
-RiskShield models fraud detection as a risk assessment problem, not a pure classification task.
+---
 
-The system:
+## 📊 Dataset Overview
+The system utilizes the **Credit Card Fraud Detection Dataset** (European cardholders).
 
-Learns patterns from historical transaction data
+* **Total Transactions:** 284,807
+* **Fraud Cases:** 492 (≈ 0.17%) — *Extreme Class Imbalance*
+* **Features:** `Time`, `Amount`, and `V1–V28` (Anonymized PCA components).
+* **Target:** `Class` (1 = Fraud, 0 = Genuine).
 
-Outputs a fraud probability score
+---
 
-Converts probability into risk categories
+## 🏗️ System Architecture
+The pipeline ensures a smooth flow from raw data to a final business decision:
 
-Maps risk levels to system actions
+`Transaction Data` ➔ `Preprocessing & Scaling` ➔ `Machine Learning Model` ➔ `Risk Scoring` ➔ `Decision Logic`
 
-This mirrors how real financial systems operate.
+---
 
-📂 Dataset
+## 🧪 Machine Learning Pipeline
 
-Source: Credit Card Fraud Detection Dataset (European cardholders)
+### 1. Data Preprocessing
+* **Stratified Splitting:** Ensures the 0.17% fraud distribution is maintained in both training and test sets.
+* **Standardization:** Features are scaled using `StandardScaler`.
+* **Imbalance Handling:** Utilizes **Class-Weighted Learning** (Balanced Logistic Regression) to ensure the model pays more attention to the minority fraud class.
 
-Transactions: 284,807
+### 2. Model Selection
+**Balanced Logistic Regression** was selected as the final model due to:
+* High **ROC-AUC** performance.
+* Exceptional **interpretability** (crucial for financial auditing).
+* Stability on PCA-transformed data.
 
-Fraud Cases: 492 (≈ 0.17%)
+---
 
-Features:
+## ⚖️ Risk Scoring Logic
 
-Time (seconds since first transaction)
+| Risk Score | Risk Level | System Decision |
+| :--- | :--- | :--- |
+| `< 0.20` | 🟢 **LOW** | **Allow** transaction automatically |
+| `0.20 – 0.70` | 🟡 **MEDIUM** | **Require Verification** (MFA/OTP) |
+| `> 0.70` | 🔴 **HIGH** | **Flag for Review** by Analyst |
 
-V1–V28 (PCA-transformed anonymized features)
+---
 
-Amount
+## 🔍 Explainability
+Risk-Shield prioritizes "White-box" AI:
+* **Global Interpretability:** Logistic Regression coefficients reveal which internal signals most influence fraud.
+* **Local Interpretability:** Integrated **SHAP values** explain why a specific transaction received a high score.
 
-Target: Class (1 = Fraud, 0 = Genuine)
+---
 
-The extreme imbalance reflects real-world fraud scenarios and makes accuracy an unreliable metric.
+## 🖥️ User Interface
+A lightweight **Streamlit** dashboard allows users to interact with the engine.
+* **Demo Mode:** Test with pre-filled transaction signals.
+* **Manual Input:** Input specific feature values to observe score changes.
+* **Visual Feedback:** Real-time display of risk level and recommended action.
 
-🏗️ System Architecture
-Transaction Data
-↓
-Preprocessing & Scaling
-↓
-Machine Learning Model
-↓
-Fraud Risk Score (0–1)
-↓
-Risk Categorization
-↓
-Decision Logic
+---
 
-🧪 Machine Learning Pipeline
-
-1. Data Preprocessing
-
-Stratified train–test split
-
-Feature scaling using StandardScaler
-
-No synthetic oversampling (to avoid data leakage)
-
-2. Models Evaluated
-
-Logistic Regression (baseline)
-
-Logistic Regression (class-weighted)
-
-Random Forest
-
-Gradient Boosting
-
-Isolation Forest (unsupervised anomaly detection)
-
-3. Final Model Selection
-
-Balanced Logistic Regression was chosen due to:
-
-Strong ROC-AUC performance
-
-Stability on PCA-transformed data
-
-High interpretability
-
-Suitability for risk-based decisions
-
-📊 Evaluation Metrics
-
-Due to class imbalance, accuracy is misleading.
-The project emphasizes:
-
-Recall (Fraud class)
-
-Precision
-
-ROC-AUC
-
-Confusion Matrix
-
-The goal is to reduce fraud loss while controlling false positives.
-
-⚖️ Risk Scoring Logic
-Risk Score Risk Level System Decision
-< 0.20 LOW Allow
-0.20 – 0.70 MEDIUM Require Verification
-
-> 0.70 HIGH Flag for Review
-
-This allows graduated responses instead of hard rejections.
-
-🔍 Explainability
-
-Logistic Regression coefficients provide global interpretability
-
-SHAP values explain individual transaction decisions
-
-Each flagged transaction can be justified to analysts
-
-🖥️ User Interface
-
-A lightweight Streamlit UI demonstrates the fraud decision engine.
-
-Features:
-
-Demo mode with pre-filled internal features
-
-Manual input for advanced users
-
-Displays:
-
-Fraud risk score
-
-Risk level
-
-Recommended system action
-
-Since the dataset uses PCA-based anonymized features, the UI represents internal transaction signals, not raw card details.
-
-📁 Project Structure
+## 📁 Project Structure
+```text
 RiskShield/
-├── app.py # Streamlit UI
+├── app.py                # Streamlit UI
 ├── src/
-│ ├── preprocess.py # Data loading & scaling
-│ ├── train.py # Model training & saving
-│ ├── evaluate.py # Evaluation utilities
-│ └── risk_logic.py # Risk & decision logic
+│   ├── preprocess.py     # Data loading & scaling
+│   ├── train.py          # Model training & saving
+│   ├── evaluate.py       # Evaluation utilities
+│   └── risk_logic.py     # Risk & decision logic
 ├── data/
-│ └── raw/creditcard.csv
+│   └── raw/              # creditcard.csv
 ├── results/
-│ ├── final_model.pkl
-│ └── scaler.pkl
-├── notebooks/ # EDA & experimentation
-├── requirements.txt
+│   ├── final_model.pkl   # Saved weights
+│   └── scaler.pkl        # Saved scaler
+├── notebooks/            # EDA & experimentation
+├── requirements.txt      
 └── README.md
+```
 
-How to Run
+🚀 How to Run
+Install Dependencies
 
-1. Install dependencies
-   pip install -r requirements.txt
+Bash
+pip install -r requirements.txt
+Train the Model
 
-2. Train the model
-   python run_pipeline.py
+python src/train.py
+Launch the UI
 
-3. Launch the UI
-   streamlit run app.py
-
-⚠️ Limitations
-
-Fraud patterns evolve over time (concept drift)
-
-Performance depends on historical data quality
-
-False positives may inconvenience users
-
-Periodic retraining is required in production systems
-
-🚀 Future Improvements
-
-Adaptive threshold tuning
-
-Cost-based optimization
-
-Real-time streaming integration
-
-Model retraining pipeline
-
-Dashboard for analysts
+streamlit run app.py
 
 🏁 Conclusion
-
-RiskShield demonstrates how machine learning can be applied responsibly to fraud detection by combining:
-
-Statistical learning
-
-Risk-aware decision logic
-
-Explainability
-
-Deployment consistency
-
-It reflects industry-relevant ML practices, not just model training.
-
-👤 Author
-
-Kartik
+RiskShield demonstrates a production-ready approach to fraud detection by combining statistical learning with risk-aware logic. It moves beyond "Accuracy" to focus on Recall and Precision, ensuring that high-value fraud is captured while legitimate customers remain unaffected.
